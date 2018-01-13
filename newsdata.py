@@ -25,24 +25,25 @@ def exec_results(query):
 def display_results_for_views(result):
     i = 0
     for r in result:
-        print ('\t'+str(result[i][0]) + ' ---> '+str(result[i][1])+' views')
+        print('\t'+str(result[i][0]) + ' ---> '+str(result[i][1])+' views')
         i = i + 1
 
 
 def display_results_for_errors(result):
     i = 0
     for r in result:
-        print ('\t'+str(result[i][0])+' ---> '+str(result[i][1])+' %\n')
+        print('\t'+str(result[i][0])+' ---> '+str(result[i][1])+' %\n')
         i = i + 1
 
-print (Question1)
+
+print(Question1)
 result1 = exec_results(Query1)
 display_results_for_views(result1)
 
-print (Question2)
+print(Question2)
 result2 = exec_results(Query2)
 display_results_for_views(result2)
 
-print (Question3)
+print(Question3)
 result3 = exec_results(Query3)
 display_results_for_errors(result3)
