@@ -51,4 +51,4 @@ Log Analysis project with PostgreSQL
 1. Once the Virtual machine is up, navigate to newsdata directory.
 2. Place the newsdata.py folder.
 3. Run the newsdata.py folder with the below command,
-python newsdata.py OR python3 newsdata.py (incase of python3)
+$ python newsdata.py
