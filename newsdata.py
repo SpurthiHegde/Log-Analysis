@@ -100,17 +100,14 @@ def display_results_for_errors(result):
 
 print(Question1)
 result1 = exec_results(Query1)
-print(result1)
 display_results_for_views(result1)
 
 print(Question2)
 result2 = exec_results(Query2)
-print(result2)
 display_results_for_views(result2)
 
 print(Question3)
 result3 = exec_results(Query3)
-print(result3)
 display_results_for_errors(result3)
 
 print("\nView created for Question 1 & 2 below,")
