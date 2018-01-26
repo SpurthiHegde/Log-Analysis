@@ -34,21 +34,29 @@ Log Analysis project with PostgreSQL
 3. Use psql -d news to connect to database.
 
 ***************Views created for running the queries below******
-1. create view artice_log_view as 
-    select count(*) as views, articles.title, articles.author 
-    from log,articles 
-    where log.path like concat('%',articles.slug) and status like '%200%' 
-    group by articles.title, articles.author order by views desc;
+1. 
+CREATE VIEW log_with_slug
+AS
+SELECT split_part(path, '/',3) AS log_slug, path, id 
+FROM log;
     
- 2.  create view ErrorPercentage_log_view as 
-      select date(time) as day,round(100.00 * sum(case when log.status = '200 OK' then 0 else 1 end)/count(log.status),2) as Error
-      Percentage 
-      from log 
-      group by day 
-      order by ErrorPercentage desc; 
+ 2.  
+CREATE VIEW log_hits
+AS
+SELECT count(*) AS hits, date_trunc('day', time) as hits_date
+FROM log
+GROUP BY date_trunc('day', time);
+
+3.  
+CREATE VIEW log_errors
+AS
+SELECT count(*) AS errors, date_trunc('day', time) as errors_date
+FROM log 
+WHERE status like '%404%'
+GROUP BY date_trunc('day', time);
       
 ********************To Run the Python program*******************
 1. Once the Virtual machine is up, navigate to newsdata directory.
-2. Place the newsdata.py folder.
-3. Run the newsdata.py folder with the below command,
+2. Create views mentioned above.
+2. Run the newsdata.py folder with the below command,
 $ python newsdata.py
