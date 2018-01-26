@@ -23,7 +23,7 @@ Log Analysis project with PostgreSQL
 3. Change directory to /vagrant and run a ls command to view the sub directories.
 4. Navigate to the newsdata.sql folder with dc command.
 
-*************Setting up the database and Creating Views***
+*************Setting up the database and Creating Views*******
 1. Load the data in local database using the command,
   psql -d news -f newsdata.sql
 2. The database includes three tables,
@@ -33,7 +33,8 @@ Log Analysis project with PostgreSQL
   * The log table includes one entry for each time a user has accessed the site.
 3. Use psql -d news to connect to database.
 
-***************Views created for running the queries below******
+***************Views created for running the queries below*********
+
 1. 
 CREATE VIEW log_with_slug
 AS
