@@ -14,25 +14,47 @@ Question1 = "\n1. What are the most popular three articles of all time?\n"
 Question2 = "\n2. Who are the most popular article authors of all time?\n"
 Question3 = "\n3. On which days did more than 1% of requests lead to errors?\n"
 
-# ArticleLog View creation query
-view1 = """CREATE VIEW artice_log_view AS SELECT count(*) AS views, articles.title,
-articles.author FROM log,articles WHERE log.path LIKE concat('%',articles.slug)
-AND status LIKE '%200%' GROUP BY articles.title, articles.author ORDER BY
-views DESC;"""
+# CREATE VIEW Query- View with slug column derived from path for log table.
+logview = """CREATE VIEW log_with_slug
+AS
+SELECT split_part(path, '/',3) AS log_slug, path, id
+FROM log;"""
 
-Query1 = "SELECT title, views FROM artice_log_view LIMIT 3"
-Query2 = """SELECT authors.name, SUM(artice_log_view.views) AS popular_author_views
-        FROM authors,artice_log_view WHERE authors.id = artice_log_view.author
-        GROUP BY authors.name ORDER BY popular_author_views DESC"""
+Query1 = """SELECT articles.title, count(*) AS articleview
+FROM articles, log_with_slug
+WHERE articles.slug = log_with_slug.log_slug
+GROUP BY articles.title
+ORDER BY articleview DESC
+LIMIT 3;"""
 
-# ErrorPercentage Log view creation query
-view2 = """CREATE VIEW ErrorPercentage_log_view AS SELECT date(time) AS day,round
-(100.00 * sum(CASE WHEN log.status = '200 OK' THEN 0 ELSE 1 END)/
-count(log.status),2) AS Error Percentage FROM log GROUP BY day ORDER BY
-ErrorPercentage DESC;"""
+Query2 = """SELECT authors.name , count(*) AS authorsview
+FROM authors, log_with_slug, articles
+WHERE authors.id = articles.author AND articles.slug = log_with_slug.log_slug
+GROUP BY authors.name
+ORDER BY authorsview DESC;"""
 
-Query3 = """SELECT to_char(day, 'DD Mon, YYYY'), errorpercentage FROM
-        ErrorPercentage_log_view WHERE errorpercentage > 1"""
+# CREATE VIEW Query- Total Log successful hits on a day from Log Table.
+loghitsview = """CREATE VIEW log_hits
+AS
+SELECT count(*) AS hits, date_trunc('day', time) as hits_date
+FROM log
+GROUP BY date_trunc('day', time);"""
+
+# CREATE VIEW Query- Total Log 404 errors on a day from Log Table.
+logerrorview = """CREATE VIEW log_errors
+AS
+SELECT count(*) AS errors, date_trunc('day', time) as errors_date
+FROM log
+WHERE status like '%404%'
+GROUP BY date_trunc('day', time);"""
+
+Query3 = """SELECT to_char(day, 'DD Mon, YYYY') AS Date,
+round(error_percent, 2) AS error_percent
+FROM (SELECT (cast(log_errors.errors as decimal)/log_hits.hits )*100
+AS error_percent, log_errors.errors_date AS day
+FROM log_errors, log_hits
+WHERE log_errors.errors_date = log_hits.hits_date) AS Temp
+WHERE Temp.error_percent > 1;"""
 
 
 def exec_results(query):
@@ -77,15 +99,22 @@ def display_results_for_errors(result):
 
 
 print(Question1)
-print("\nView created for Question 1 & 2 is: %s\n" % view1)
 result1 = exec_results(Query1)
+print(result1)
 display_results_for_views(result1)
 
 print(Question2)
 result2 = exec_results(Query2)
+print(result2)
 display_results_for_views(result2)
 
 print(Question3)
-print("\nView created for Question 3 is: %s\n" % view2)
 result3 = exec_results(Query3)
+print(result3)
 display_results_for_errors(result3)
+
+print("\nView created for Question 1 & 2 below,")
+print("\n%s" % logview)
+print("\nViews created for Question 3 below,")
+print("\n%s" % loghitsview)
+print("\n%s" % logerrorview)
