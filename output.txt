@@ -14,3 +14,26 @@
 3. On which days did more than 1% of requests lead to errors?
 
         17 Jul, 2016 ---> 2.26 %
+
+
+View created for Question 1 & 2 below,
+
+CREATE VIEW log_with_slug
+AS
+SELECT split_part(path, '/',3) AS log_slug, path, id
+FROM log;
+
+Views created for Question 3 below,
+
+CREATE VIEW log_hits
+AS
+SELECT count(*) AS hits, date_trunc('day', time) as hits_date
+FROM log
+GROUP BY date_trunc('day', time);
+
+CREATE VIEW log_errors
+AS
+SELECT count(*) AS errors, date_trunc('day', time) as errors_date
+FROM log
+WHERE status like '%404%'
+GROUP BY date_trunc('day', time);
